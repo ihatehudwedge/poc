@@ -1,8 +1,8 @@
 
 # 1. 기본 정보
 
-**CVE**: CVE-2026-109618(multipart 파싱 중 OOM 처리 불완전 초기화된 요청 상태 노출) CVE-2026-109619(해제된 요청 메모리를 참조하는 전역 상태로 인한 UAF)
-**발현 조건**: `session.upload_progress.enabled` 값이 1이며, 유한한 `memory_limit` + `mod_php prefork` 동일 워커 조건 추가
+- **CVE**: CVE-2026-109618(multipart 파싱 중 OOM 처리 불완전 초기화된 요청 상태 노출) CVE-2026-109619(해제된 요청 메모리를 참조하는 전역 상태로 인한 UAF)
+- **발현 조건**: `session.upload_progress.enabled` 값이 1이며, 유한한 `memory_limit` + `mod_php prefork` 동일 워커 조건 추가
 
 PHP2Shell은 PHP 엔진이 multipart 요청 처리 중 메모리 부족 상태에서 해제되었거나 덜 초기화된 요청 메모리를 정리·재사용하고, 이전 요청의 전역 상태가 해제된 메모리를 계속 참조한 채 다음 요청에서 쓰이면서, 인증 없는 HTTP 요청만으로 메모리 손상·노출과 웹 워커 권한의 원격 코드 실행이 발생하는 취약점입니다.
 
