@@ -10,7 +10,7 @@ PHP2Shell은 PHP 엔진이 multipart 요청 처리 중 메모리 부족 상태�
 
 ## 2.1. 인프라 구성도
 
-![[Pasted image 20261025221854.png]]
+<img width="1590" height="918" alt="image" src="https://github.com/user-attachments/assets/c67c0276-b469-467f-8d6b-bcf13218a993" />
 
 - **Attack PC**: 실제 PHP2Shell 공격을 수행하게 되는 PC
 - **PHP Server**: PHP 취약점이 존재하는 Docker 서버
@@ -160,7 +160,7 @@ docker rm vuln-php-test
 docker exec -it vuln-php-test php -i | grep session.upload_progress
 ```
 
-![[Pasted image 20261025230821.png]]
+<img width="956" height="149" alt="image" src="https://github.com/user-attachments/assets/18394037-6ce8-49f6-8d8b-ab0a56b9084a" />
 
 # 3. 공격 원리 분석
 
@@ -260,7 +260,7 @@ PHP2Shell은 다양한 공격이 체인 형태로 연결을 수행하여 최종�
 
 방어 시나리오는 다음과 같이 설계하였습니다.
 
-![[Pasted image 20261028232702.png]]
+<img width="707" height="398" alt="image" src="https://github.com/user-attachments/assets/90b133d1-7d99-4d65-ad11-845f5bc44541" />
 
 - **Phase 1 (준비/유발):** 공격자가 매우 긴 Base64 문자열이나 거대한 배열을 보내 PHP 메모리 한도를 초과시킵니다. Snort는 이를 탐지하고 해당 출발지 IP에 대해 `php2shell.oom` 플래그를 300초간 켭니다.
 - **Phase 2-A (세션 고정):** 300초 이내에 동일한 IP가 임의의 `PHPSESSID`를 설정하여 요청을 보냅니다.
