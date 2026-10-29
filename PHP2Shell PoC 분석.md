@@ -262,9 +262,9 @@ PHP2Shell은 다양한 공격이 체인 형태로 연결을 수행하여 최종�
 
 <img width="707" height="398" alt="image" src="https://github.com/user-attachments/assets/90b133d1-7d99-4d65-ad11-845f5bc44541" />
 
-- **Phase 1 (준비/유발):** 공격자가 매우 긴 Base64 문자열이나 거대한 배열을 보내 PHP 메모리 한도를 초과시킵니다. Snort는 이를 탐지하고 해당 출발지 IP에 대해 `php2shell.oom` 플래그를 300초간 켭니다.
-- **Phase 2-A (세션 고정):** 300초 이내에 동일한 IP가 임의의 `PHPSESSID`를 설정하여 요청을 보냅니다.
-- **Phase 2-B (페이로드 주입):** 300초 이내에 동일한 IP가 세션 변수에 4,000바이트 이상의 악성 셸코드나 가비지 값을 덮어씌웁니다.
+- **Phase 1 (준비/유발):** 공격자가 매우 긴 Base64 문자열이나 거대한 배열을 보내 PHP 메모리 한도를 초과시키는 공격을 탐지합니다.
+- **Phase 2-A (세션 고정):** 임의의 `PHPSESSID`를 설정하여 요청을 보내는 공격을 탐지합니다.
+- **Phase 2-B (페이로드 주입):** 세션 변수에 4,000바이트 이상의 악성 셸코드나 가비지 값을 덮어씌우는 공격을 탐지합니다.
 
 참고로 Snort 규칙만으로는 PHP2Shell의 근본적인 대책이 될 수 없음을 참고하시기 바랍니다.
 
@@ -274,14 +274,14 @@ PHP2Shell은 다양한 공격이 체인 형태로 연결을 수행하여 최종�
 
 ```snort
 alert http any any -> any any (
-msg:"PHP2Shell - OOM trigger with upload progress";
-flow:to_server,established;
-http_method;content:"POST";
-http_header;content:"multipart/form-data",nocase;
-http_client_body;content:"name=",nocase;
-pcre:"/(?:(?:\[[^\]]*\]){10,}|(?:[a-zA-Z0-9_=\-\+\/]){256,})/";
-reference:cve,2026-109618;
-sid:1000001; rev:1;
+  msg:"PHP2Shell - OOM trigger with upload progress";
+  flow:to_server,established;
+  http_method;content:"POST";
+  http_header;content:"multipart/form-data",nocase;
+  http_client_body;content:"name=",nocase;
+  pcre:"/(?:(?:\[[^\]]*\]){10,}|(?:[a-zA-Z0-9_=\-\+\/]){256,})/";
+  reference:cve,2026-109618;
+  sid:1000001; rev:1;
 )
 ```
 
@@ -291,15 +291,15 @@ sid:1000001; rev:1;
 
 ```snort
 alert http any any -> any any (
-msg:"PHP2Shell - attacker-set session id after OOM prep";
-flow:to_server,established;
-http_method; content:"POST";
-http_header; content:"multipart/form-data", nocase;
-http_client_body;
-content:"PHP_SESSION_UPLOAD_PROGRESS", nocase, fast_pattern;
-pcre:"/name=[\"']?PHPSESSID[\"']?/i";
-reference:cve,2026-109619;
-sid:1000002; rev:1;
+  msg:"PHP2Shell - attacker-set session id after OOM prep";
+  flow:to_server,established;
+  http_method; content:"POST";
+  http_header; content:"multipart/form-data", nocase;
+  http_client_body;
+  content:"PHP_SESSION_UPLOAD_PROGRESS", nocase, fast_pattern;
+  pcre:"/name=[\"']?PHPSESSID[\"']?/i";
+  reference:cve,2026-109619;
+  sid:1000002; rev:1;
 )
 ```
 
